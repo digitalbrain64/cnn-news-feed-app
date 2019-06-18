@@ -1,7 +1,8 @@
 <!doctype html>
 
 <html>
-  <title>CNN Travel News</title>
+	<head>
+    <title>CNN News Feeds</title>
   <link rel="shortcut icon" href="https://image.flaticon.com/icons/png/512/826/826328.png" type="image/gif">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -15,10 +16,10 @@
 	<body>
 	<header class="container-fluid logoBG">
       <a href="/" ><img class="logo" src="news-logo.png"></a>
-    <a href="/" class="right">log out<i class="glyphicon glyphicon-log-out"></i></a>
+      <input id="search-input-small-screen" class="form-control" type="text" placeholder="Search" name="search" autocomplete="off">
     </header>
 
-   <nav class="navbar sticky-top navbar-expand-lg navbar-light bg-light">
+   <nav class="navbar sticky-top navbar-expand-lg navbar-dark bg-dark">
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -39,7 +40,6 @@
                     <form class="navbar-form navbar-right" >
               <div class="input-group">
                 <input id="search_input" autocomplete="off" type="text" class="form-control" placeholder="Search" name="search">
-                
               </div>
              </form>
                

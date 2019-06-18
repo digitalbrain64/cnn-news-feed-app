@@ -25,6 +25,12 @@ span{
 .logo{
     width: 80px;
 }
+#search-input-small-screen{
+    width: 200px;
+    display: none;
+    float: right;
+}
+
 
 .right{
     float: right;
@@ -82,11 +88,20 @@ span{
     .card{
         width: 500px!important;
     }
+    #search-input-small-screen{
+        display: block;
+    }
+    #search_input{
+        display: none;
+    }
+    
 }
+    
 
 /* rules for smartphone screen */
 @media screen and (max-width: 460px) {
     .card{
         width: 500px!important;
     }
+    
 }

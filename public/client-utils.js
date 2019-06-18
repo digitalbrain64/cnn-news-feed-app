@@ -28,7 +28,7 @@ no_results.src = "nores.png";
 function getGeoLocation() {
   // user granted permission
   function success(position) {
-    $.ajax({url: `http://api.openweathermap.org/data/2.5/weather?lat=${position.coords.latitude}&lon=${position.coords.longitude}&APPID=${openWeatherApiKey}`,
+    $.ajax({url: `https://api.openweathermap.org/data/2.5/weather?lat=${position.coords.latitude}&lon=${position.coords.longitude}&APPID=${openWeatherApiKey}`,
       dataType: "json",
       method: 'GET',
       success: function(result){
@@ -58,7 +58,7 @@ function getGeoLocation() {
 }
 
 // on input change even (search feature)
-$("#search_input").on("change paste keyup",function(){
+$("#search_input , #search-input-small-screen").on("change paste keyup",function(){
   document.getElementById("feedSection").innerHTML = ''
   document.getElementById("feedSection").appendChild(no_results);
   $(no_results).hide();
