@@ -1,7 +1,10 @@
+// sPath is current html filename with '/' at the start
 var sPath = window.location.pathname;
-//var sPage = sPath.substring(sPath.lastIndexOf('\\') + 1);
+
+// substring filename with no '/'
 var sPage = sPath.substring(sPath.lastIndexOf('/') + 1);
 
+// api keys
 var rss2JsonApiKey = "36vkyefajtemeunatvuxyud59n3hq0tomyzcetjr";
 var openWeatherApiKey = "dd600a6f3524bad742db42efe5147d7e";
 var reverseGeoCodingApiKey = "e2385fa5e79744";
@@ -11,44 +14,47 @@ var rssLinks = ["http://rss.cnn.com/rss/edition.rss","http://rss.cnn.com/rss/edi
 "http://rss.cnn.com/rss/edition_meast.rss","http://rss.cnn.com/rss/edition_space.rss","http://rss.cnn.com/rss/edition_entertainment.rss",
 "http://rss.cnn.com/rss/edition_sport.rss","http://rss.cnn.com/rss/edition_travel.rss"];
 
-// loading png image
+// 'loading' gif image
 var loading_img = document.createElement('img');
 loading_img.id = "loading_gif";
 loading_img.src = "loading.gif";
 document.getElementById("feedSection").appendChild(loading_img);
 
-// no results png image
+// 'no results' png image
 var no_results = document.createElement('img');
 no_results.id = "nores";
 no_results.src = "nores.png";
 
 
 
-
+// getting the geolocation from user
 function getGeoLocation() {
-  // user granted permission
+  // user granted permission for location
   function success(position) {
     $.ajax({url: `https://api.openweathermap.org/data/2.5/weather?lat=${position.coords.latitude}&lon=${position.coords.longitude}&APPID=${openWeatherApiKey}`,
       dataType: "json",
       method: 'GET',
       success: function(result){
+        // create the weather card according to user location
         createWeatherCard(result);
       },
       beforeSend: function(){
+        // show loading gif
         $(loading_img).show();
       },
       complete: function(){
+        // hide loading gif
         $(loading_img).hide();
       }
     });
   }
 
-  // user declined permission
+  // user declined permission for location
   function error() {
     console.log('Unable to retrieve your location');
   }
 
-  // location not supported by the browser
+  // if location not supported by the browser
   if (!navigator.geolocation) {
     console.log('Geolocation is not supported by your browser');
   } else {
@@ -57,12 +63,17 @@ function getGeoLocation() {
   }
 }
 
-// on input change even (search feature)
+/* global search feature : */
+// search input element : on input change event (search feature)
 $("#search_input , #search-input-small-screen").on("change paste keyup",function(){
+  // clear the #feedSection 
   document.getElementById("feedSection").innerHTML = ''
+  // add 'no results' png
   document.getElementById("feedSection").appendChild(no_results);
+  // hide 'no results'
   $(no_results).hide();
 
+  // if search input value is empty = load content again
   if(!this.value){
     document.getElementById("feedSection").innerHTML = '';
     loadPage();
@@ -75,49 +86,11 @@ $("#search_input , #search-input-small-screen").on("change paste keyup",function
   }
 });
 
-
-function createWeatherCard(weatherObj){
-  console.log(weatherObj.weather);
-  
-  var weatherJumbo = document.createElement("jumbotron");
-  weatherJumbo.className = "jumbotron";
-  weatherJumbo.style.margin = "10px";
-  weatherJumbo.style.alignSelf = "flex-start";
-
-  
-  
-
-  var weatherIcon = document.createElement("img");
-  weatherIcon.src = `http://openweathermap.org/img/w/${weatherObj.weather[0].icon}.png`;
-  weatherIcon.style.width = "100px";
-  weatherIcon.style.cssFloat = "right";
-
-  var title = document.createElement("h3");
-  title.innerText = "Current Condition";
-  title.style.fontWeight = "bold";
-
-  var temp = document.createElement("p");
-  temp.innerText = weatherObj.main.temp;
-  var press = document.createElement("p");
-  press.innerText = weatherObj.main.pressure;
-  var hum = document.createElement("p");
-  hum.innerText = weatherObj.main.humidity;
-
-
-
-  weatherJumbo.appendChild(weatherIcon);
-  weatherJumbo.appendChild(title);
-  weatherJumbo.appendChild(temp);
-  weatherJumbo.appendChild(press);
-  weatherJumbo.appendChild(hum);
-  document.getElementById("feedSection").appendChild(weatherJumbo);
-
-}
-
-// global search function
-// rssLink = link to rss feeds
+// rssLink = link to rss feeds (rssLinks Array)
 // input = input from the search field (<input...)
 function globalSearch(rssLink, input){
+  // ajax rss2json api
+  $(loading_img).show();
   $.ajax({
     url: 'https://api.rss2json.com/v1/api.json',
     method: 'GET',
@@ -138,6 +111,7 @@ function globalSearch(rssLink, input){
       var title = response.items[i].title.toLowerCase();
       // check desc and title if contains input
       if(desc.includes(input) || title.includes(input)){
+        // create feed card
         createFeedCard(response.items[i], input);
       }
     }
@@ -158,10 +132,69 @@ function globalSearch(rssLink, input){
 })
 }
 
+/* method creating the weather card */
+function createWeatherCard(weatherObj){
 
+  var weatherCard = document.createElement("div");
+  weatherCard.className = "card";
+  weatherCard.style.width = "400px";
+  weatherCard.style.padding = "20px";
+  weatherCard.style.color = "#727272";
+  weatherCard.style.alignSelf = "flex-start";
+
+  var weatherDivCardBody = document.createElement("div");
+  weatherDivCardBody.className = "card-body";
+
+  var cityName = document.createElement("h3");
+  cityName.innerHTML = weatherObj.name;
+  cityName.className = "card-title"
+
+  var weatherIcon = document.createElement("img");
+  weatherIcon.src = `http://openweathermap.org/img/w/${weatherObj.weather[0].icon}.png`;
+  weatherIcon.style.width = "100px";
+  weatherIcon.style.cssFloat = "right";
+  weatherIcon.style.marginTop = "-90px"
+
+
+  var temp = document.createElement("h4");
+  // converting from Kelvin to Celcius
+  temp.innerText = parseInt(weatherObj.main.temp-273.15)+"C";
+  temp.style.fontSize = "70px";
+  temp.cssFloat = "left";
+  temp.style.color = "#4c4c4c";
+
+
+
+  var press = document.createElement("p");
+  press.innerText = weatherObj.main.pressure;
+
+
+
+  var hum = document.createElement("p");
+  hum.innerText = weatherObj.main.humidity+"%";
+
+  var windSpeedIcon = document.createElement("img");
+  windSpeedIcon.src = "https://banner2.kisspng.com/20180424/qsq/kisspng-computer-icons-humidity-weather-wind-speed-famous-family-wind-5aded662520844.202234551524553314336.jpg";
+  windSpeedIcon.style.width = "60px";
+  
+
+
+  weatherDivCardBody.appendChild(cityName);
+  weatherDivCardBody.appendChild(temp);
+  weatherDivCardBody.appendChild(weatherIcon);
+  weatherDivCardBody.appendChild(windSpeedIcon);
+  weatherDivCardBody.appendChild(hum);
+  weatherCard.appendChild(weatherDivCardBody);
+  document.getElementById("feedSection").appendChild(weatherCard);
+
+}
+
+
+/* fetching rss feeds using the rss2json api */
 function fetchFeeds(rssLink){
   // unique api key
   var sortedItems;
+  $(loading_img).show();
   
   // using jQuerry ajax
   // this call is an api specific
@@ -190,9 +223,7 @@ function fetchFeeds(rssLink){
       }
       
     },
-    beforeSend: function() {
-      $(loading_img).hide().fadeIn('100');
-    },
+    
     complete : function () {
       $(loading_img).hide();
       $('#feedSection').hide().fadeIn('100');
@@ -203,7 +234,7 @@ function fetchFeeds(rssLink){
 
 
 
-// creating feed section with cards
+// creating feed cards and place in feed section
 function createFeedCard(feedObj, search_str){
 
   // using regex to remove any '<img...' or any other HTML tags from feed description
@@ -237,15 +268,17 @@ function createFeedCard(feedObj, search_str){
 
   // description text from feed object
   var descText = feedObj.description.replace(patt,'');//replacing any html tags with ''
-
+  desc.innerHTML = descText;
   title.innerHTML = feedObj.title;
-
   if(search_str != null){
+    
     
     // using regex pattern to find the search string (upper or lower case)
     // regex example :
     // if search word is trump (or Trump)->regex pattern:  /([trumpTRUMP]{5})/g
     var ptrn = `([${search_str.toLowerCase()}${search_str.toUpperCase()}]{${search_str.length}})`;
+    console.log(ptrn);
+    
     var re = new RegExp(ptrn,"g");
 
     // $1 replace with first match

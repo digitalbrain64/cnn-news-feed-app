@@ -74,6 +74,12 @@ span{
     .card{
         width: 300px!important;
     }
+    #search-input-small-screen{
+        display: block;
+    }
+    #search_input{
+        display: none;
+    }
 }
 
 /* rules for regular screen */
@@ -103,5 +109,13 @@ span{
     .card{
         width: 500px!important;
     }
+    #search-input-small-screen{
+        display: block;
+    }
+    #search_input{
+        display: none;
+    }
     
 }
+
+
