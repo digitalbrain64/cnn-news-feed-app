@@ -7,7 +7,6 @@ var sPage = sPath.substring(sPath.lastIndexOf('/') + 1);
 // api keys
 var rss2JsonApiKey = "36vkyefajtemeunatvuxyud59n3hq0tomyzcetjr";
 var openWeatherApiKey = "dd600a6f3524bad742db42efe5147d7e";
-var reverseGeoCodingApiKey = "e2385fa5e79744";
 
 // array of rss links needed for global search function
 var rssLinks = ["http://rss.cnn.com/rss/edition.rss","http://rss.cnn.com/rss/edition_world.rss","http://rss.cnn.com/rss/edition_technology.rss",
@@ -25,33 +24,17 @@ var no_results = document.createElement('img');
 no_results.id = "nores";
 no_results.src = "nores.png";
 
-
-
 // getting the geolocation from user
 function getGeoLocation() {
   // user granted permission for location
   function success(position) {
-    $.ajax({url: `https://api.openweathermap.org/data/2.5/weather?lat=${position.coords.latitude}&lon=${position.coords.longitude}&APPID=${openWeatherApiKey}`,
-      dataType: "json",
-      method: 'GET',
-      success: function(result){
-        // create the weather card according to user location
-        createWeatherCard(result);
-      },
-      beforeSend: function(){
-        // show loading gif
-        $(loading_img).show();
-      },
-      complete: function(){
-        // hide loading gif
-        $(loading_img).hide();
-      }
-    });
+    getLocalWeather(position);
   }
 
   // user declined permission for location
   function error() {
-    console.log('Unable to retrieve your location');
+    $(loading_img).hide();
+    createWeatherCard(null, false);
   }
 
   // if location not supported by the browser
@@ -61,6 +44,26 @@ function getGeoLocation() {
     // all good - locating...
     navigator.geolocation.getCurrentPosition(success, error);
   }
+}
+
+function getLocalWeather(position){
+  $.ajax({url: `https://api.openweathermap.org/data/2.5/weather?lat=${position.coords.latitude}&lon=${position.coords.longitude}&APPID=${openWeatherApiKey}`,
+    dataType: "json",
+    method: 'GET',
+    success: function(result){
+      // create the weather card according to user location
+      createWeatherCard(result,false);
+    },
+    beforeSend: function(){
+      // show loading gif
+      $(loading_img).show();
+    },
+    complete: function(){
+      // hide loading gif
+      $(loading_img).hide();
+    }
+  });
+  
 }
 
 /* global search feature : */
@@ -133,60 +136,142 @@ function globalSearch(rssLink, input){
 }
 
 /* method creating the weather card */
-function createWeatherCard(weatherObj){
+function createWeatherCard(weatherObj, isSearch){
 
   var weatherCard = document.createElement("div");
-  weatherCard.className = "card";
+
+  weatherCard.className = "card weatherCard";
+  weatherCard.style.margin = "10px";
   weatherCard.style.width = "400px";
   weatherCard.style.padding = "20px";
   weatherCard.style.color = "#727272";
   weatherCard.style.alignSelf = "flex-start";
+  weatherCard.style.background = "#ededed";
 
   var weatherDivCardBody = document.createElement("div");
   weatherDivCardBody.className = "card-body";
 
   var cityName = document.createElement("h3");
-  cityName.innerHTML = weatherObj.name;
+  if(weatherObj == null){
+    cityName.innerHTML = "Unable to get your location";
+  }
+  else{
+    cityName.innerHTML = weatherObj.name;
+  }
   cityName.className = "card-title"
 
   var weatherIcon = document.createElement("img");
-  weatherIcon.src = `http://openweathermap.org/img/w/${weatherObj.weather[0].icon}.png`;
-  weatherIcon.style.width = "100px";
+  if(weatherObj == null){
+    weatherIcon.src = 'https://static.thenounproject.com/png/29993-200.png'
+  }
+  else{
+    weatherIcon.src = `http://openweathermap.org/img/w/${weatherObj.weather[0].icon}.png`;
+  }
+  weatherIcon.style.width = "110px";
   weatherIcon.style.cssFloat = "right";
-  weatherIcon.style.marginTop = "-90px"
+
+
+
+  var weatherDesc = document.createElement("h4");
+  if(weatherObj == null){
+    weatherDesc.innerHTML = "---------------";
+  }
+  else{
+    weatherDesc.innerHTML = weatherObj.weather[0].description;
+  }
+  weatherDesc.style.fontSize = "15px";
+  weatherDesc.style.marginTop = "2px";
+  weatherDesc.style.textAlign = "center";
+
+
+  var weatherIconAndDescDiv = document.createElement("div");
+  weatherIconAndDescDiv.className = "column";
+  weatherIconAndDescDiv.style.cssFloat = "right";
+  weatherIconAndDescDiv.style.marginTop = "-120px";
+  weatherIconAndDescDiv.appendChild(weatherIcon);
+  weatherIconAndDescDiv.appendChild(weatherDesc);
+
+
+
+  // wind speed icon
+  var windSpeedIcon = document.createElement("img");
+  windSpeedIcon.src = "/images/wind_speed_icon.png";
+  windSpeedIcon.style.width = "25px";
+  windSpeedIcon.style.marginLeft = "18px";
+  windSpeedIcon.style.height = "25px";
+
+  // wind speed information
+  var windSpeedInfo = document.createElement("p");
+  if(weatherObj == null){
+    windSpeedInfo.innerHTML = "N/A";
+  }
+  else{
+    windSpeedInfo.innerHTML = weatherObj.wind.speed+"m/s";
+  }
+  windSpeedInfo.style.textAlign = "center";
+  windSpeedInfo.style.marginLeft = "10px";
+  windSpeedInfo.style.marginBottom = "2px";
+
+  // wind speed row div
+  var windSpeedDiv = document.createElement("div");
+  windSpeedDiv.className = "row";
+  windSpeedDiv.style.marginTop = "30px";
+  windSpeedDiv.appendChild(windSpeedIcon);
+  windSpeedDiv.appendChild(windSpeedInfo);
+
+
+  // humidity icon
+  var humidityIcon = document.createElement("img");
+  humidityIcon.src = "/images/humidity_icon.png";
+  humidityIcon.style.width = "30px";
+  humidityIcon.style.height = "30px";
+
+  // humidity information
+  var humidityInfo = document.createElement("p");
+  if(weatherObj == null){
+    humidityInfo.innerHTML = "N/A";
+  }
+  else{
+    humidityInfo.innerHTML = weatherObj.main.humidity+"%";
+  }
+  humidityInfo.style.textAlign = "center";
+  humidityInfo.style.marginLeft = "10px";
+  humidityInfo.style.marginTop = "4px";
+
+  // wind speed row div
+  var humidityDiv = document.createElement("div");
+  humidityDiv.className = "row";
+  humidityDiv.style.marginLeft = "0px";
+  humidityDiv.style.marginTop = "10px";
+  humidityDiv.appendChild(humidityIcon);
+  humidityDiv.appendChild(humidityInfo);
+
 
 
   var temp = document.createElement("h4");
   // converting from Kelvin to Celcius
-  temp.innerText = parseInt(weatherObj.main.temp-273.15)+"C";
-  temp.style.fontSize = "70px";
+  if(weatherObj == null){
+    temp.innerHTML = "N/A";
+  }
+  else{
+    temp.innerHTML = parseInt(weatherObj.main.temp-273.15)+"&deg";
+  }
+  temp.style.fontSize = "90px";
   temp.cssFloat = "left";
   temp.style.color = "#4c4c4c";
 
 
 
-  var press = document.createElement("p");
-  press.innerText = weatherObj.main.pressure;
-
-
-
-  var hum = document.createElement("p");
-  hum.innerText = weatherObj.main.humidity+"%";
-
-  var windSpeedIcon = document.createElement("img");
-  windSpeedIcon.src = "https://banner2.kisspng.com/20180424/qsq/kisspng-computer-icons-humidity-weather-wind-speed-famous-family-wind-5aded662520844.202234551524553314336.jpg";
-  windSpeedIcon.style.width = "60px";
-  
-
-
   weatherDivCardBody.appendChild(cityName);
   weatherDivCardBody.appendChild(temp);
-  weatherDivCardBody.appendChild(weatherIcon);
-  weatherDivCardBody.appendChild(windSpeedIcon);
-  weatherDivCardBody.appendChild(hum);
+  weatherDivCardBody.appendChild(weatherIconAndDescDiv);
+  weatherDivCardBody.appendChild(windSpeedDiv);
+  weatherDivCardBody.appendChild(humidityDiv);
   weatherCard.appendChild(weatherDivCardBody);
-  document.getElementById("feedSection").appendChild(weatherCard);
-
+  
+    document.getElementById("feedSection").appendChild(weatherCard);
+    console.log("feed");
+  
 }
 
 
@@ -231,8 +316,6 @@ function fetchFeeds(rssLink){
   
 });
 }
-
-
 
 // creating feed cards and place in feed section
 function createFeedCard(feedObj, search_str){
@@ -317,6 +400,7 @@ function createFeedCard(feedObj, search_str){
   document.getElementById("feedSection").appendChild(divFeed);
 }
 
+// method loading page according to page name (weather, world, top-stories...)
 function loadPage(){
   switch(sPage){
     case "":
@@ -344,11 +428,11 @@ function loadPage(){
         fetchFeeds("http://rss.cnn.com/rss/edition_travel.rss");
         break;
     case "weather":
-        
         getGeoLocation();
         break;
   }
 }
+
 
 loadPage();
 

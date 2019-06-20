@@ -1,18 +1,12 @@
-// adding npm packages: fs (file system), Express,  Handlebars, path
-const path = require('path');
+// adding npm packages: Express
 const express = require('express');
 
 
 // use port provided by the cloud hosting OR port 3000
 const port = process.env.PORT || 3000;
-const fs = require('fs');
 
 // app is now a server
 var app = express();
-
-/* Creating Dynamic html page using Handlebars package */
-
-
 
 // adding a folder to be viewable for clients ('public' folder and sub directories)
 app.use(express.static(__dirname+ '/public/styles'));
@@ -71,9 +65,7 @@ app.get('/weather', (req, res) => {
   
 });
 
-
-
-// listening on available port
+// listening on available port (set by cloud or default 3000)
 app.listen(port, () =>{
   console.log(`Server is listening on port ${port}`);
 });
