@@ -9,4 +9,7 @@ By clicking each news categorie the rss feeds are updated so you always get the 
 - Weather according to your location: please allow location for the weather page to see the weather at your location
 - the app is flexible and works (and looks) beautifly on mobile.
 
+
+link to the app: https://digital-brainz-cnn-news-app.herokuapp.com
+
 hope you like this little app=)
