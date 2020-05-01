@@ -1,5 +1,5 @@
 # cnn-news-feed-app
-Simple Web App for fetching and displaying CNN RSS feeds
+Web App for fetching and displaying CNN RSS feeds
 
 By using the official CNN RSS feeds (http://edition.cnn.com/services/rss/), this app diaplays all the latest news feeds.
 By clicking each news categorie the rss feeds are updated so you always get the latest news.
